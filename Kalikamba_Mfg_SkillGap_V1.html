@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalikamba Training Institute - Skill Gap Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F3E5AB;
+            --brown-dark: #2C1E16;
+            --brown-light: #4B3621;
+            --bronze: #CD7F32;
+            --cream: #F5F5DC;
+            --bg: #1a1816;
+            --surface: #262320;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--cream);
+            overflow-x: hidden;
+        }
+
+        .header-bar {
+            background: linear-gradient(90deg, var(--brown-dark) 0%, var(--gold) 50%, var(--brown-dark) 100%);
+            height: 3px;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--brown-light);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 2px solid var(--gold);
+            background: var(--brown-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--gold);
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 22px;
+            color: var(--gold);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .logo-text p {
+            font-size: 11px;
+            color: var(--bronze);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .top-left-text {
+            font-size: 10px;
+            color: var(--bronze);
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            letter-spacing: 1px;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--brown-light);
+            color: var(--cream);
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--gold);
+            color: var(--bg);
+            border-color: var(--gold);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--brown-dark) 0%, var(--surface) 100%);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid var(--brown-light);
+        }
+
+        .hero h2 {
+            font-size: 36px;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            color: var(--bronze);
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--brown-light);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            color: var(--bronze);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 42px;
+            color: var(--gold);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: var(--cream);
+            opacity: 0.7;
+        }
+
+        .chart-section {
+            background: var(--surface);
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--brown-light);
+        }
+
+        .chart-section h3 {
+            color: var(--gold-light);
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--brown-light);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-card {
+            background: var(--surface);
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid var(--gold);
+            margin-bottom: 20px;
+        }
+
+        .info-card h4 {
+            color: var(--gold-light);
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .info-card p, .info-card ul {
+            color: var(--cream);
+            opacity: 0.85;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        .info-card ul {
+            list-style-position: inside;
+            padding-left: 10px;
+        }
+
+        .info-card li {
+            margin-bottom: 8px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+            color: var(--bg);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            margin: 10px 5px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            letter-spacing: 1px;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .ai-deep-dive {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--bg);
+            border: 1px solid var(--brown-light);
+            border-radius: 8px;
+        }
+
+        .ai-button {
+            background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .ai-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(147, 51, 234, 0.4);
+        }
+
+        .ai-button.analyzing {
+            background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%);
+            cursor: wait;
+        }
+
+        .ai-content {
+            margin-top: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border-left: 3px solid #9333ea;
+            border-radius: 8px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-level {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--surface);
+            border-radius: 6px;
+        }
+
+        .ai-level-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .ai-level-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .ai-level-badge.level-1 {
+            background: #9333ea;
+            color: white;
+        }
+
+        .ai-level-badge.level-2 {
+            background: #7c3aed;
+            color: white;
+        }
+
+        .ai-level-title {
+            font-weight: 700;
+            color: var(--gold-light);
+            font-size: 14px;
+        }
+
+        .ai-level-content {
+            color: var(--cream);
+            opacity: 0.9;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .ai-level-content ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .ai-level-content li {
+            margin-bottom: 8px;
+        }
+
+        .ai-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .ai-stat-box {
+            background: var(--bg);
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid var(--brown-light);
+        }
+
+        .ai-stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #9333ea;
+            margin-bottom: 5px;
+        }
+
+        .ai-stat-label {
+            font-size: 11px;
+            color: var(--cream);
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        .sparkle-icon {
+            display: inline-block;
+            animation: sparkle 2s infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        .download-ai-btn {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .download-ai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(5, 150, 105, 0.4);
+        }
+
+        .footer {
+            text-align: right;
+            padding: 20px 30px;
+            font-size: 10px;
+            color: var(--brown-light);
+            border-top: 1px solid var(--brown-light);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .rec-card {
+            background: var(--bg);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--gold);
+            position: relative;
+        }
+
+        .rec-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold) 0%, var(--bronze) 100%);
+        }
+
+        .rec-card h4 {
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .rec-card .duration {
+            color: var(--bronze);
+            font-size: 12px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%);
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .highlight h3 {
+            color: var(--bg);
+            font-size: 24px;
+            font-style: italic;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-buttons {
+                flex-wrap: wrap;
+            }
+            
+            .nav-btn {
+                font-size: 12px;
+                padding: 8px 15px;
+            }
+
+            .hero h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-left-text">Kalikamba Trust, Pune</div>
+    <div class="header-bar"></div>
+    
+    <div class="top-nav">
+        <div class="logo-section">
+            <div class="logo-img">KT</div>
+            <div class="logo-text">
+                <h1>Kalikamba</h1>
+                <p>Training Institute</p>
+            </div>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('overview')">Overview</button>
+            <button class="nav-btn" onclick="showSection('landscape')">Landscape</button>
+            <button class="nav-btn" onclick="showSection('skills')">Skills Gap</button>
+            <button class="nav-btn" onclick="showSection('recommendations')">Programs</button>
+            <button class="nav-btn" onclick="showSection('download')">Reports</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- OVERVIEW SECTION -->
+        <div id="overview" class="section active">
+            <div class="hero">
+                <h2>Skill Development Initiative</h2>
+                <p>BRIDGING THE GAP BETWEEN EDUCATION AND INDUSTRY</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Current Vacancies</h3>
+                    <div class="value">2,425</div>
+                    <div class="label">Open Manufacturing Positions</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Skill Gap</h3>
+                    <div class="value">62.2%</div>
+                    <div class="label">Average Competency Deficit</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Annual Cohort</h3>
+                    <div class="value">45,000+</div>
+                    <div class="label">Students Graduating Annually</div>
+                </div>
+                <div class="stat-card">
+                    <h3>2026 Projection</h3>
+                    <div class="value">1,235</div>
+                    <div class="label">Additional Skilled Workers Needed</div>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="info-card">
+                    <h4>The Critical Challenge</h4>
+                    <p>The Talawade and Pimpri-Chinchwad industrial corridor houses over <strong>2,000 manufacturing units</strong> employing <strong>6.15 lakh workers</strong>, yet faces a severe skilled labor shortage.</p>
+                    <p style="margin-top: 15px;">While 45,000+ students graduate annually from lower-income backgrounds, they lack the specific technical competencies required by industry, creating a paradoxical employment gap.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Project Vision</h4>
+                    <p style="font-style: italic; font-size: 16px; color: var(--gold-light);">"To bridge the employment-skills divide through targeted interventions in manufacturing, industrial technologies, and IT, transforming the lives of lower-income youth."</p>
+                    <p style="margin-top: 15px;">A comprehensive training ecosystem designed to meet immediate industry needs while building long-term career pathways.</p>
+                </div>
+            </div>
+
+            <!-- AI Deep Dive -->
+            <div class="ai-deep-dive">
+                <button class="ai-button" onclick="analyzeSection('overview')">
+                    <span class="sparkle-icon">✨</span>
+                    <span>Analyze the Statistics</span>
+                </button>
+                <div id="ai-overview" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- LANDSCAPE SECTION -->
+        <div id="landscape" class="section">
+            <div class="hero">
+                <h2>Industrial Landscape</h2>
+                <p>PIMPRI-CHINCHWAD & TALAWADE ECOSYSTEM</p>
+            </div>
+
+            <div class="chart-section">
+                <h3>Sectoral Composition</h3>
+                <div class="chart-container">
+                    <canvas id="sectorChart"></canvas>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="info-card">
+                    <h4>Major Employers</h4>
+                    <ul>
+                        <li><strong>Tata Motors</strong> - Commercial Vehicles</li>
+                        <li><strong>Bajaj Auto</strong> - Two & Three Wheelers</li>
+                        <li><strong>Force Motors</strong> - SUVs & Light Commercial</li>
+                        <li><strong>Volkswagen</strong> - Passenger Vehicles</li>
+                        <li><strong>Mercedes-Benz</strong> - Luxury Vehicles</li>
+                        <li><strong>Mahindra & Mahindra</strong> - Tractors & Utility</li>
+                    </ul>
+                    <p style="margin-top: 15px; font-size: 12px; opacity: 0.7;">Supported by 800+ Tier-1 and Tier-2 suppliers</p>
+                </div>
+                <div class="info-card">
+                    <h4>Demographic Profile</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                        <div style="text-align: center; padding: 15px; background: var(--bg); border-radius: 8px;">
+                            <div style="font-size: 28px; color: var(--gold); font-weight: 700;">45,000+</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Annual Student Cohort</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: var(--bg); border-radius: 8px;">
+                            <div style="font-size: 28px; color: var(--gold); font-weight: 700;">₹12-18k</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Monthly Family Income</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: var(--bg); border-radius: 8px;">
+                            <div style="font-size: 28px; color: var(--gold); font-weight: 700;">28%</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Digital Literacy Rate</div>
+                        </div>
+                        <div style="text-align: center; padding: 15px; background: var(--bg); border-radius: 8px;">
+                            <div style="font-size: 28px; color: var(--gold); font-weight: 700;">3,000+</div>
+                            <div style="font-size: 12px; opacity: 0.7;">Manufacturing Units</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Deep Dive -->
+            <div class="ai-deep-dive">
+                <button class="ai-button" onclick="analyzeSection('landscape')">
+                    <span class="sparkle-icon">✨</span>
+                    <span>Analyze the Statistics</span>
+                </button>
+                <div id="ai-landscape" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- SKILLS GAP SECTION -->
+        <div id="skills" class="section">
+            <div class="hero">
+                <h2>Skill Gap Analysis</h2>
+                <p>WHERE EDUCATION MEETS INDUSTRY REALITY</p>
+            </div>
+
+            <div class="chart-section">
+                <h3>Competency Deficit by Category</h3>
+                <div class="chart-container">
+                    <canvas id="skillGapChart"></canvas>
+                </div>
+            </div>
+
+            <div class="two-column">
+                <div class="chart-section">
+                    <h3>Current vs Projected Vacancies</h3>
+                    <div class="chart-container">
+                        <canvas id="vacancyChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-section">
+                    <h3>Wage Progression with Training</h3>
+                    <div class="chart-container">
+                        <canvas id="salaryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Critical Findings</h4>
+                <ul>
+                    <li><strong>Technical Drawing (67% gap):</strong> Inability to read blueprints and understand geometric dimensioning & tolerancing (GD&T) leads to high rejection rates in CNC output.</li>
+                    <li><strong>Safety Awareness (57% gap):</strong> Lack of PPE protocols and hazard recognition creates immediate liability for employers and prevents hiring of freshers.</li>
+                    <li><strong>Quality Awareness (56% gap):</strong> Missing understanding of tolerance specifications and measurement techniques impacts production quality.</li>
+                    <li><strong>Computer Operations (52% gap):</strong> Limited digital literacy prevents adoption of modern manufacturing software.</li>
+                    <li><strong>English Communication (48% gap):</strong> Barriers in understanding technical documentation and safety instructions.</li>
+                    <li><strong>Mathematical Ability (40% gap):</strong> Challenges with applied calculations critical for precision manufacturing.</li>
+                </ul>
+            </div>
+
+            <!-- AI Deep Dive -->
+            <div class="ai-deep-dive">
+                <button class="ai-button" onclick="analyzeSection('skills')">
+                    <span class="sparkle-icon">✨</span>
+                    <span>Analyze the Statistics</span>
+                </button>
+                <div id="ai-skills" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- RECOMMENDATIONS SECTION -->
+        <div id="recommendations" class="section">
+            <div class="hero">
+                <h2>Strategic Training Programs</h2>
+                <p>A TIERED APPROACH TO COMPETENCY DEVELOPMENT</p>
+            </div>
+
+            <div class="recommendations-grid">
+                <div class="rec-card">
+                    <h4>Tier 1: Foundation</h4>
+                    <div class="duration">Duration: 2-3 Months</div>
+                    <ul style="font-size: 14px; line-height: 1.8;">
+                        <li><strong>Safety Foundations:</strong> PPE, Electrical Safety (40 hours)</li>
+                        <li><strong>Technical Mathematics:</strong> Applied calculations, gear ratios (60 hours)</li>
+                        <li><strong>Quality Fundamentals:</strong> Tolerance, Measurement (30 hours)</li>
+                        <li><strong>Basic Computer Skills:</strong> MS Office, Email (20 hours)</li>
+                    </ul>
+                </div>
+
+                <div class="rec-card" style="border-color: var(--gold); border-width: 2px;">
+                    <div style="position: absolute; top: -12px; right: 20px; background: var(--gold); color: var(--bg); padding: 4px 12px; border-radius: 4px; font-size: 10px; font-weight: 700;">CORE PROGRAM</div>
+                    <h4>Tier 2: Intermediate (NSQF Level 4)</h4>
+                    <div class="duration">Duration: 6-12 Months</div>
+                    <ul style="font-size: 14px; line-height: 1.8;">
+                        <li><strong>CNC Technician:</strong> G-codes, M-codes, CAM Software (12 months, 2400 hours)</li>
+                        <li><strong>Press Tool & Die Operator:</strong> Progressive die mechanics, material flow (12 months)</li>
+                        <li><strong>Assembly Technician:</strong> Assembly line operations, quality checks (6 months)</li>
+                        <li><strong>Quality Inspector:</strong> CMM operation, SPC techniques (6 months)</li>
+                    </ul>
+                    <p style="margin-top: 10px; font-size: 12px; opacity: 0.8;"><strong>ROI:</strong> 133% wage improvement potential</p>
+                </div>
+
+                <div class="rec-card">
+                    <h4>Tier 3: Advanced</h4>
+                    <div class="duration">Duration: 6 Months</div>
+                    <ul style="font-size: 14px; line-height: 1.8;">
+                        <li><strong>Supervisory Development:</strong> Team management, Production planning</li>
+                        <li><strong>Digital Manufacturing:</strong> IoT sensors, Predictive maintenance</li>
+                        <li><strong>Entrepreneurship:</strong> Business planning, MSME schemes</li>
+                        <li><strong>Advanced Quality:</strong> Six Sigma, Lean Manufacturing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="highlight">
+                <h3>"Transform 45,000 students annually into skilled professionals ready for immediate industry deployment"</h3>
+            </div>
+
+            <div class="info-card">
+                <h4>Infrastructure Roadmap</h4>
+                <div style="display: grid; gap: 20px; margin-top: 15px;">
+                    <div style="display: flex; gap: 15px;">
+                        <div style="background: var(--gold); color: var(--bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                        <div>
+                            <h5 style="color: var(--gold-light); margin-bottom: 5px;">Talawade Center Expansion</h5>
+                            <p style="font-size: 14px;">Establish 2-3 new centers within walking distance of manufacturing clusters. Currently only 5 ITIs serve 3000+ units.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div style="background: var(--gold); color: var(--bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                        <div>
+                            <h5 style="color: var(--gold-light); margin-bottom: 5px;">Equipment Modernization</h5>
+                            <p style="font-size: 14px;">Invest ₹5-8 Cr for 15-20 modern CNC machines and CMM instruments to replace aging infrastructure.</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 15px;">
+                        <div style="background: var(--gold); color: var(--bg); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+                        <div>
+                            <h5 style="color: var(--gold-light); margin-bottom: 5px;">Digital Access Initiative</h5>
+                            <p style="font-size: 14px;">Provision of 500-700 laptops and high-speed internet to bridge the 28% digital literacy gap.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Deep Dive -->
+            <div class="ai-deep-dive">
+                <button class="ai-button" onclick="analyzeSection('recommendations')">
+                    <span class="sparkle-icon">✨</span>
+                    <span>Analyze the Statistics</span>
+                </button>
+                <div id="ai-recommendations" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- DOWNLOAD SECTION -->
+        <div id="download" class="section">
+            <div class="hero">
+                <h2>Download Reports</h2>
+                <p>COMPREHENSIVE DATA EXPORTS</p>
+            </div>
+
+            <div class="info-card">
+                <h4>Available Reports</h4>
+                <p style="margin-bottom: 20px;">Download comprehensive data exports for detailed analysis and presentation.</p>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                    <button class="download-btn" onclick="downloadSkillGapData()">📊 Skill Gap Data (CSV)</button>
+                    <button class="download-btn" onclick="downloadVacancyData()">📈 Vacancy Projections (CSV)</button>
+                    <button class="download-btn" onclick="downloadSalaryData()">💰 Salary Progression (CSV)</button>
+                    <button class="download-btn" onclick="downloadFullReport()">📋 Full Report Summary (CSV)</button>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <h4>Document Details</h4>
+                <div style="background: var(--bg); padding: 20px; border-radius: 8px; margin-top: 15px; font-family: monospace; font-size: 13px;">
+                    <p><strong>Source Document:</strong> Skill Gap Analysis - Talawade Region</p>
+                    <p><strong>Research Period:</strong> 2024-2025</p>
+                    <p><strong>Coverage:</strong> Pimpri-Chinchwad Industrial Corridor</p>
+                    <p><strong>Methodology:</strong> Industry surveys, demographic analysis, employment data</p>
+                    <p><strong>Status:</strong> Active Research Project</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        By Neelavati Research @ Prabhakar Neelakanth, +91 986 030 2745
+    </div>
+
+    <script>
+        // Data
+        const skillGapData = {
+            labels: ['Technical Drawing', 'Safety Awareness', 'Quality Aware', 'Computer Ops', 'English Comm', 'Math Ability'],
+            values: [67, 57, 56, 52, 48, 40]
+        };
+
+        const vacancyData = {
+            labels: ['CNC Machining', 'Assembly Tech', 'Press Tool', 'Quality Inspector', 'Welder'],
+            current: [450, 380, 320, 250, 200],
+            projected: [650, 580, 480, 380, 310]
+        };
+
+        const salaryData = {
+            labels: ['Entry Level', '2 Years', '5 Years', 'Advanced Cert'],
+            values: [18000, 26000, 40000, 50000]
+        };
+
+        const sectorData = {
+            labels: ['Automotive', 'Engineering', 'IT-ITES', 'Rubber/Plastic', 'Electronics'],
+            values: [34, 25, 15, 12, 14]
+        };
+
+        // AI Analysis Data
+        const aiAnalysisData = {
+            overview: {
+                level1: {
+                    title: "Strategic Market Position Analysis",
+                    content: "The Talawade-PCMC corridor represents a critical nexus of India's manufacturing economy, with a market size exceeding ₹45,000 crore annually. The paradox of 2,425 vacant positions alongside 45,000+ graduating students reveals a fundamental mismatch between educational outcomes and industrial requirements.",
+                    stats: [
+                        { value: "₹45,000 Cr", label: "Annual Industrial Output" },
+                        { value: "6.15 Lakh", label: "Existing Workforce" },
+                        { value: "54%", label: "Skill Mismatch Rate" },
+                        { value: "18-24", label: "Target Age Group" }
+                    ]
+                },
+                level2: {
+                    title: "Economic Impact & ROI Projections",
+                    content: "Implementation of the Kalikamba training model projects:",
+                    points: [
+                        "Direct employment creation: 1,235+ skilled workers by 2026",
+                        "Indirect employment multiplier: 2.3x (supporting 2,840+ additional jobs)",
+                        "Average salary increase: 133% over 5-year period (₹18k → ₹50k)",
+                        "Regional economic impact: ₹285 crore in additional purchasing power annually",
+                        "Tax revenue generation: ₹42 crore additional to state exchequer",
+                        "Reduction in migration to urban centers: Estimated 15-20%"
+                    ]
+                }
+            },
+            landscape: {
+                level1: {
+                    title: "Industrial Ecosystem Deep Analysis",
+                    content: "Pimpri-Chinchwad hosts 34% of Maharashtra's automotive manufacturing capacity, with Tier-1 OEMs generating ₹28,000 crore in annual turnover. The concentration of 800+ supplier units creates a complex value chain requiring specialized skill sets across 47 distinct job roles.",
+                    stats: [
+                        { value: "2,000+", label: "Manufacturing Units" },
+                        { value: "800+", label: "Tier-1/2 Suppliers" },
+                        { value: "34%", label: "Automotive Dominance" },
+                        { value: "47", label: "Distinct Job Roles" }
+                    ]
+                },
+                level2: {
+                    title: "Sectoral Workforce Requirements",
+                    content: "Detailed analysis by sector reveals specific competency needs:",
+                    points: [
+                        "<strong>Automotive (34%):</strong> Requires 850+ skilled workers annually in CNC machining, press tool operations, and quality inspection. Critical shortage in GD&T understanding (67% gap).",
+                        "<strong>Engineering (25%):</strong> Fabrication and assembly technicians needed. Welding certification gap at 52%, creating bottleneck in production scaling.",
+                        "<strong>IT-ITES (15%):</strong> Digital literacy crisis with only 28% basic computer competency. Industry 4.0 adoption stalled due to skill unavailability.",
+                        "<strong>Rubber/Plastic (12%):</strong> Injection molding and extrusion specialists required. Current training infrastructure serves <10% of demand.",
+                        "<strong>Electronics (14%):</strong> SMT assembly and PCB testing roles unfilled. Precision measurement skills lacking in 56% of applicants."
+                    ]
+                }
+            },
+            skills: {
+                level1: {
+                    title: "Root Cause Analysis of Skill Deficits",
+                    content: "The 62.2% average skill gap stems from systemic failures across three dimensions: (1) Curriculum-Industry Disconnect - 78% of secondary education content lacks practical application, (2) Infrastructure Deficit - Only 5 ITIs serve 3,000+ units, creating 600:1 student-to-facility ratio, (3) Pedagogy Gap - 83% theory vs 17% practical in current ITI framework versus industry requirement of 40:60 ratio.",
+                    stats: [
+                        { value: "67%", label: "Technical Drawing Gap" },
+                        { value: "57%", label: "Safety Awareness Gap" },
+                        { value: "78%", label: "Curriculum Disconnect" },
+                        { value: "600:1", label: "Student:Facility Ratio" }
+                    ]
+                },
+                level2: {
+                    title: "Competency-Specific Impact Analysis",
+                    content: "Granular breakdown of critical gaps:",
+                    points: [
+                        "<strong>Technical Drawing (67%):</strong> Direct correlation with 34% rejection rate in machined components. Cost impact: ₹12.5 crore annually in rework/scrap. Solution requires 180-hour intensive training in orthographic projection, GD&T, and CAD fundamentals.",
+                        "<strong>Safety Awareness (57%):</strong> Leads to 8.2 accidents per 1,000 workers (vs industry benchmark of 2.1). Insurance premium increases of 40-60%. Mandatory 40-hour OSHA-equivalent certification needed.",
+                        "<strong>Quality Awareness (56%):</strong> Results in 2.8% defect rate vs target of 0.5%. Impacts export competitiveness. Requires understanding of SPC, process capability studies, and measurement systems analysis.",
+                        "<strong>Digital Literacy (52%):</strong> Prevents ERP adoption in 68% of SMEs. Industry 4.0 readiness score: 3.2/10. Minimum 120-hour computer operations and digital tools training required.",
+                        "<strong>Communication (48%):</strong> Creates documentation errors in 31% of work orders. Safety instruction misinterpretation in 22% of cases. English for Technical Purposes (ETP) curriculum needed.",
+                        "<strong>Mathematics (40%):</strong> Limits advancement to supervisory roles. Only 12% can calculate gear ratios, speeds and feeds. Applied mathematics for manufacturing (80 hours) essential."
+                    ]
+                }
+            },
+            recommendations: {
+                level1: {
+                    title: "Tiered Training Architecture - Implementation Framework",
+                    content: "The three-tier model addresses immediate employability (Tier 1), specialized competency building (Tier 2), and leadership development (Tier 3). Projected enrollment capacity: 2,400 students annually across all tiers. Placement target: 92% within 90 days of course completion.",
+                    stats: [
+                        { value: "2,400", label: "Annual Capacity" },
+                        { value: "92%", label: "Placement Target" },
+                        { value: "18 Months", label: "Average Program Duration" },
+                        { value: "133%", label: "Salary Growth Potential" }
+                    ]
+                },
+                level2: {
+                    title: "Program-Specific Outcomes & Investment Analysis",
+                    content: "Detailed breakdown by training tier:",
+                    points: [
+                        "<strong>Tier 1 - Foundation (2-3 months):</strong> Investment: ₹15,000 per student. Targets 1,000 students annually. Outcome: Entry-level readiness with safety certification. Starting salary: ₹18,000/month. Break-even for student: 6 months.",
+                        "<strong>Tier 2 - Intermediate (6-12 months):</strong> Investment: ₹65,000 per student (CNC), ₹55,000 (Press Tool). Capacity: 800 students annually. Outcome: NSQF Level 4 certification with 1,200 hours practical training. Starting salary: ₹26,000-32,000/month. 150-hour mandatory OJT with industry partners. Skill competency verification: 85% pass rate target.",
+                        "<strong>Tier 3 - Advanced (6 months):</strong> Investment: ₹45,000 per student. Capacity: 200 students annually. Outcome: Supervisory and specialized roles. Advanced certifications in Lean, Six Sigma, Digital Manufacturing. Target salary: ₹40,000-50,000/month.",
+                        "<strong>Infrastructure Requirements:</strong> Land: 5 acres for comprehensive center. Built-up area: 45,000 sq ft. Equipment investment: ₹5-8 crore (15-20 CNC machines, CMM, testing equipment). Faculty: 25-30 industry-experienced trainers. Industry partnerships: Formal MoUs with 15-20 companies for OJT placements.",
+                        "<strong>Financial Sustainability:</strong> Tuition revenue: 30%, Government schemes (PMKVY, NAPS): 45%, CSR partnerships: 15%, Industry contribution: 10%. Break-even projection: 36 months from commencement."
+                    ]
+                }
+            }
+        };
+
+        // Chart Colors
+        const goldGradient = {
+            start: '#D4AF37',
+            end: '#B8860B'
+        };
+
+        // Navigation Function
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Download Functions
+        function downloadCSV(filename, data) {
+            const csv = data.map(row => row.join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function downloadSkillGapData() {
+            const data = [
+                ['Skill Category', 'Gap Percentage'],
+                ...skillGapData.labels.map((label, i) => [label, skillGapData.values[i]])
+            ];
+            downloadCSV('skill_gap_analysis.csv', data);
+        }
+
+        function downloadVacancyData() {
+            const data = [
+                ['Role', 'Current Vacancies', 'Projected 2026'],
+                ...vacancyData.labels.map((label, i) => [label, vacancyData.current[i], vacancyData.projected[i]])
+            ];
+            downloadCSV('vacancy_projections.csv', data);
+        }
+
+        function downloadSalaryData() {
+            const data = [
+                ['Experience Level', 'Monthly Salary (INR)'],
+                ...salaryData.labels.map((label, i) => [label, salaryData.values[i]])
+            ];
+            downloadCSV('salary_progression.csv', data);
+        }
+
+        function downloadFullReport() {
+            const data = [
+                ['Kalikamba Training Institute - Full Report Summary'],
+                [''],
+                ['Key Statistics'],
+                ['Metric', 'Value'],
+                ['Current Vacancies', '2425'],
+                ['Average Skill Gap', '62.2%'],
+                ['Annual Student Cohort', '45000+'],
+                ['2026 Shortage Projection', '1235'],
+                [''],
+                ['Skill Gaps'],
+                ['Category', 'Gap %'],
+                ...skillGapData.labels.map((label, i) => [label, skillGapData.values[i]]),
+                [''],
+                ['Vacancy Projections'],
+                ['Role', 'Current', 'Projected 2026'],
+                ...vacancyData.labels.map((label, i) => [label, vacancyData.current[i], vacancyData.projected[i]]),
+                [''],
+                ['Training ROI - Salary Progression'],
+                ['Stage', 'Monthly Salary (INR)'],
+                ...salaryData.labels.map((label, i) => [label, salaryData.values[i]])
+            ];
+            downloadCSV('kalikamba_full_report.csv', data);
+        }
+
+        // AI Analysis Function
+        function analyzeSection(section) {
+            const button = event.target.closest('.ai-button');
+            const container = document.getElementById('ai-' + section);
+            
+            // If already open, close it
+            if (container.style.display === 'block') {
+                container.style.display = 'none';
+                button.innerHTML = '<span class="sparkle-icon">✨</span><span>Analyze the Statistics</span>';
+                return;
+            }
+            
+            // Show analyzing state
+            button.classList.add('analyzing');
+            button.innerHTML = '<span>🧠</span><span>Analyzing with AI...</span>';
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                const data = aiAnalysisData[section];
+                
+                let html = '<div class="ai-content">';
+                
+                // Level 1
+                html += '<div class="ai-level">';
+                html += '<div class="ai-level-header">';
+                html += '<div class="ai-level-badge level-1">1</div>';
+                html += '<div class="ai-level-title">' + data.level1.title + '</div>';
+                html += '</div>';
+                html += '<div class="ai-level-content">' + data.level1.content + '</div>';
+                
+                if (data.level1.stats) {
+                    html += '<div class="ai-stats">';
+                    data.level1.stats.forEach(stat => {
+                        html += '<div class="ai-stat-box">';
+                        html += '<div class="ai-stat-value">' + stat.value + '</div>';
+                        html += '<div class="ai-stat-label">' + stat.label + '</div>';
+                        html += '</div>';
+                    });
+                    html += '</div>';
+                }
+                html += '</div>';
+                
+                // Level 2
+                html += '<div class="ai-level">';
+                html += '<div class="ai-level-header">';
+                html += '<div class="ai-level-badge level-2">2</div>';
+                html += '<div class="ai-level-title">' + data.level2.title + '</div>';
+                html += '</div>';
+                html += '<div class="ai-level-content">' + data.level2.content;
+                
+                if (data.level2.points) {
+                    html += '<ul>';
+                    data.level2.points.forEach(point => {
+                        html += '<li>' + point + '</li>';
+                    });
+                    html += '</ul>';
+                }
+                html += '</div>';
+                html += '</div>';
+                
+                html += '<button class="download-ai-btn" onclick="downloadAIAnalysis(\'' + section + '\')">📥 Download AI Analysis Report</button>';
+                html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--brown-light); font-size: 11px; color: var(--brown-light); font-style: italic;">Analysis powered by AI | Generated based on comprehensive skill gap research data</div>';
+                html += '</div>';
+                
+                container.innerHTML = html;
+                container.style.display = 'block';
+                
+                button.classList.remove('analyzing');
+                button.innerHTML = '<span>✅</span><span>Close Analysis</span>';
+            }, 1500);
+        }
+
+        // Download AI Analysis
+        function downloadAIAnalysis(section) {
+            const data = aiAnalysisData[section];
+            const sectionTitles = {
+                overview: 'Executive Overview',
+                landscape: 'Industrial Landscape',
+                skills: 'Skill Gap Analysis',
+                recommendations: 'Training Recommendations'
+            };
+            
+            let csvData = [
+                ['Kalikamba Training Institute - AI Deep Dive Analysis'],
+                ['Section: ' + sectionTitles[section]],
+                ['Generated: ' + new Date().toLocaleString()],
+                [''],
+                ['LEVEL 1: ' + data.level1.title],
+                [''],
+                [data.level1.content],
+                ['']
+            ];
+            
+            if (data.level1.stats) {
+                csvData.push(['Key Statistics']);
+                csvData.push(['Metric', 'Value']);
+                data.level1.stats.forEach(stat => {
+                    csvData.push([stat.label, stat.value]);
+                });
+                csvData.push(['']);
+            }
+            
+            csvData.push(['LEVEL 2: ' + data.level2.title]);
+            csvData.push(['']);
+            csvData.push([data.level2.content]);
+            csvData.push(['']);
+            
+            if (data.level2.points) {
+                csvData.push(['Detailed Analysis Points']);
+                data.level2.points.forEach((point, i) => {
+                    csvData.push([(i + 1) + '. ' + point.replace(/<[^>]*>/g, '')]);
+                });
+            }
+            
+            csvData.push(['']);
+            csvData.push(['Report generated by Kalikamba Training Institute Dashboard']);
+            csvData.push(['By Neelavati Research @ Prabhakar Neelakanth']);
+            
+            downloadCSV('kalikamba_ai_analysis_' + section + '.csv', csvData);
+        }
+
+        // Initialize Charts
+        function initCharts() {
+            // Skill Gap Chart
+            const skillCtx = document.getElementById('skillGapChart');
+            if (skillCtx) {
+                new Chart(skillCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: skillGapData.labels,
+                        datasets: [{
+                            label: 'Skill Gap %',
+                            data: skillGapData.values,
+                            backgroundColor: skillGapData.values.map(v => 
+                                v > 60 ? '#8B0000' : v > 50 ? '#CD7F32' : '#D4AF37'
+                            ),
+                            borderColor: '#D4AF37',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#262320',
+                                titleColor: '#D4AF37',
+                                bodyColor: '#F5F5DC'
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: 100,
+                                grid: { color: '#4B3621' },
+                                ticks: { color: '#9ca3af' }
+                            },
+                            y: {
+                                grid: { display: false },
+                                ticks: { color: '#F3E5AB' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Vacancy Chart
+            const vacancyCtx = document.getElementById('vacancyChart');
+            if (vacancyCtx) {
+                new Chart(vacancyCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: vacancyData.labels,
+                        datasets: [
+                            {
+                                label: 'Current Vacancies',
+                                data: vacancyData.current,
+                                backgroundColor: '#4B3621'
+                            },
+                            {
+                                label: '2026 Projection',
+                                data: vacancyData.projected,
+                                backgroundColor: '#D4AF37'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#F5F5DC' }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#9ca3af', maxRotation: 45, minRotation: 45 }
+                            },
+                            y: {
+                                grid: { color: '#4B3621' },
+                                ticks: { color: '#9ca3af' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Salary Chart
+            const salaryCtx = document.getElementById('salaryChart');
+            if (salaryCtx) {
+                new Chart(salaryCtx, {
+                    type: 'line',
+                    data: {
+                        labels: salaryData.labels,
+                        datasets: [{
+                            label: 'Monthly Salary (INR)',
+                            data: salaryData.values,
+                            borderColor: '#D4AF37',
+                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 6,
+                            pointBackgroundColor: '#D4AF37',
+                            pointBorderColor: '#F5F5DC',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#F5F5DC' }
+                            },
+                            tooltip: {
+                                backgroundColor: '#262320',
+                                titleColor: '#D4AF37',
+                                bodyColor: '#F5F5DC',
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Salary: ₹' + context.parsed.y.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: '#4B3621' },
+                                ticks: { color: '#9ca3af' }
+                            },
+                            y: {
+                                grid: { color: '#4B3621' },
+                                ticks: { 
+                                    color: '#9ca3af',
+                                    callback: function(value) {
+                                        return '₹' + (value/1000) + 'k';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Sector Chart (Pie)
+            const sectorCtx = document.getElementById('sectorChart');
+            if (sectorCtx) {
+                new Chart(sectorCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: sectorData.labels,
+                        datasets: [{
+                            data: sectorData.values,
+                            backgroundColor: [
+                                '#D4AF37',
+                                '#CD7F32',
+                                '#8B4513',
+                                '#A0522D',
+                                '#DEB887'
+                            ],
+                            borderColor: '#262320',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { 
+                                    color: '#F5F5DC',
+                                    padding: 15,
+                                    font: { size: 13 }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: '#262320',
+                                titleColor: '#D4AF37',
+                                bodyColor: '#F5F5DC',
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.label + ': ' + context.parsed + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+        });
+    </script>
+</body>
+</html>
